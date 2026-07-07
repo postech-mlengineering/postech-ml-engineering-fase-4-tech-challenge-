@@ -1,0 +1,1 @@
+# Repositório do projeto para o tech challenge da fase 4 da pós-graduação em machine learning engineering da FIAP. 
