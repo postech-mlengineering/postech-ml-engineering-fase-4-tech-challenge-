@@ -7,8 +7,8 @@ services:
     dockerfilePath: Dockerfile
     plan: free
 
-  # 2. Prometheus Private Service
-  - type: pserv
+  # 2. Prometheus Service (web, since pserv is not available on free tier)
+  - type: web
     name: prometheus
     env: docker
     dockerContext: monitoring
@@ -25,6 +25,8 @@ services:
     envVars:
       - key: GF_DATABASE_TYPE
         value: postgres
+      - key: GF_DATASOURCE_PROMETHEUS_URL
+        value: https://prometheus.onrender.com
       - key: GF_DATABASE_HOST
         fromDatabase:
           name: grafana-db
