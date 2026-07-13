@@ -1,0 +1,28 @@
+services:
+  # 1. API Web Service
+  - type: web
+    name: api
+    env: docker
+    dockerContext: backend
+    dockerfilePath: Dockerfile
+    plan: free
+
+  # 2. Prometheus Private Service
+  - type: pserv
+    name: prometheus
+    env: docker
+    dockerContext: monitoring
+    dockerfilePath: prometheus.Dockerfile
+    plan: free
+
+  # 3. Grafana Web Service
+  - type: web
+    name: grafana
+    env: docker
+    dockerContext: monitoring
+    dockerfilePath: grafana.Dockerfile
+    plan: free
+    disk:
+      name: grafana-db
+      mountPath: /var/lib/grafana
+      sizeGB: 1

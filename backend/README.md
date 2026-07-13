@@ -1,6 +1,6 @@
 # Stock LSTM Prediction API (Backend)
 
-This is the backend service for the Stock LSTM Prediction API. It exposes endpoints to authenticate users, check service health, readiness, Prometheus metrics, and run next-day closing price predictions using a trained LSTM model.
+This is the backend service for the Stock LSTM Prediction API. It exposes endpoints to check service health, readiness, Prometheus metrics, and run next-day closing price predictions using a trained LSTM model.
 
 ## Prerequisites
 
@@ -62,24 +62,7 @@ Interactive Swagger documentation will be available at: [http://127.0.0.1:8000/d
 
 ## Endpoint Details
 
-### 1. Authenticate User & Get Token (`POST /auth/token`)
-Accepts JSON payload with credentials and returns a JWT access token valid for 30 minutes.
-- **Request Body:**
-  ```json
-  {
-    "username": "admin",
-    "password": "admin"
-  }
-  ```
-- **Response Example:**
-  ```json
-  {
-    "access_token": "eyJhbGciOiJIUzI1NiIsIn...",
-    "token_type": "bearer"
-  }
-  ```
-
-### 2. Root Health Check (`GET /`)
+### 1. Root Health Check (`GET /`)
 Checks whether the server is up and if the required model artifacts are loaded.
 - **Response Example:**
   ```json
@@ -89,7 +72,7 @@ Checks whether the server is up and if the required model artifacts are loaded.
   }
   ```
 
-### 3. Deployment Health Check (`GET /health`)
+### 2. Deployment Health Check (`GET /health`)
 Used for readiness checks in environments like Docker, Kubernetes, etc.
 - **Response Example:**
   ```json
@@ -99,11 +82,8 @@ Used for readiness checks in environments like Docker, Kubernetes, etc.
   }
   ```
 
-### 4. Predict Next Closing Price (`POST /predict`)
+### 3. Predict Next Closing Price (`POST /predict`)
 Requires a history of at least 60 prices. Only the last 60 prices are used for inference.
-- **Security**: Requires a valid Bearer token in the `Authorization` header (`Authorization: Bearer <token>`).
-- **Caching**: Response predictions are cached in-memory for 5 minutes using a hash of the input sequence.
-- **Rate Limit**: Enforces a limit of 5 requests per minute per IP address. Exceeding this returns a `429 Too Many Requests` status code.
 - **Body Example:**
   ```json
   {
@@ -117,5 +97,5 @@ Requires a history of at least 60 prices. Only the last 60 prices are used for i
   }
   ```
 
-### 5. Prometheus Metrics (`GET /metrics`)
+### 4. Prometheus Metrics (`GET /metrics`)
 Exposes performance metrics for Prometheus scraping.
