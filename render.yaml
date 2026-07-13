@@ -35,15 +35,15 @@ services:
           property: port
       - key: GF_DATABASE_NAME
         fromDatabase:
-          name: grafanadb
+          name: grafana-db
           property: database
       - key: GF_DATABASE_USER
         fromDatabase:
-          name: grafanadb
+          name: grafana-db
           property: user
       - key: GF_DATABASE_PASSWORD
         fromDatabase:
-          name: grafanadb
+          name: grafana-db
           property: password
 
 databases:
