@@ -22,7 +22,31 @@ services:
     dockerContext: monitoring
     dockerfilePath: grafana.Dockerfile
     plan: free
-    disk:
-      name: grafana-db
-      mountPath: /var/lib/grafana
-      sizeGB: 1
+    envVars:
+      - key: GF_DATABASE_TYPE
+        value: postgres
+      - key: GF_DATABASE_HOST
+        fromDatabase:
+          name: grafana-db
+          property: host
+      - key: GF_DATABASE_PORT
+        fromDatabase:
+          name: grafana-db
+          property: port
+      - key: GF_DATABASE_NAME
+        fromDatabase:
+          name: grafanadb
+          property: database
+      - key: GF_DATABASE_USER
+        fromDatabase:
+          name: grafanadb
+          property: user
+      - key: GF_DATABASE_PASSWORD
+        fromDatabase:
+          name: grafanadb
+          property: password
+
+databases:
+  # Free-tier Postgres for Grafana session & dashboard persistence
+  - name: grafana-db
+    plan: free
