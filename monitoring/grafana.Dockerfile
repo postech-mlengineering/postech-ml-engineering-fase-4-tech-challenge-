@@ -1,3 +1,3 @@
 FROM grafana/grafana:latest
-COPY grafana/provisioning /etc/grafana/provisioning
-COPY grafana/dashboards /etc/grafana/provisioning/dashboards
+COPY monitoring/grafana/provisioning /etc/grafana/provisioning
+COPY monitoring/grafana/dashboards /etc/grafana/provisioning/dashboards

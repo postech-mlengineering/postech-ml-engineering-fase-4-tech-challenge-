@@ -3,24 +3,24 @@ services:
   - type: web
     name: api
     env: docker
-    dockerContext: backend
-    dockerfilePath: Dockerfile
+    dockerContext: .
+    dockerfilePath: ./backend/Dockerfile
     plan: free
 
-  # 2. Prometheus Service (web, since pserv is not available on free tier)
+  # 2. Prometheus Service
   - type: web
     name: prometheus
     env: docker
-    dockerContext: monitoring
-    dockerfilePath: prometheus.Dockerfile
+    dockerContext: .
+    dockerfilePath: ./monitoring/prometheus.Dockerfile
     plan: free
 
   # 3. Grafana Web Service
   - type: web
     name: grafana
     env: docker
-    dockerContext: monitoring
-    dockerfilePath: grafana.Dockerfile
+    dockerContext: .
+    dockerfilePath: ./monitoring/grafana.Dockerfile
     plan: free
     envVars:
       - key: GF_DATABASE_TYPE
