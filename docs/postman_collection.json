@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "8c4a17df-88c9-4b45-a7b6-c956b7c5b128",
     "name": "Stock LSTM Prediction API",
-    "description": "Collection for authentication, ephemeral model training on Render Free, status checks, prediction, and metrics. Run Get Access Token, then Train Model before using Predict Next Close.",
+    "description": "Collection for authentication, local model artifact training on Render Free, status checks, prediction, and metrics. Run Get Access Token, then Train Model before using Predict Next Close.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -39,7 +39,7 @@
       ]
     },
     {
-      "name": "Models (Administrator)",
+      "name": "ML (Administrator)",
       "item": [
         {
           "name": "Train Model",
@@ -54,8 +54,8 @@
               "mode": "raw",
               "raw": "{\n  \"ticker\": \"{{ticker}}\",\n  \"start_date\": \"{{start_date}}\",\n  \"lookback\": {{lookback}},\n  \"epochs\": {{epochs}}\n}"
             },
-            "url": "{{base_url}}/models/train",
-            "description": "Downloads market data and trains synchronously. Requires the administrator user. On Render Free the model exists only until the service restarts, sleeps, or is redeployed."
+            "url": "{{base_url}}/ml/train",
+            "description": "Downloads market data and trains synchronously, writing model.pth, scaler.pkl, and metadata.json locally. Requires the administrator user. On Render Free the files are lost after restart, sleep, or redeploy."
           },
           "response": []
         },
@@ -64,8 +64,8 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": "{{base_url}}/models/active",
-            "description": "Returns whether an active in-memory model exists and, when it does, its ticker, timestamp, parameters, and metrics."
+            "url": "{{base_url}}/ml/active",
+            "description": "Returns whether the local model artifacts exist and, when they do, their ticker, timestamp, parameters, and metrics."
           },
           "response": []
         }

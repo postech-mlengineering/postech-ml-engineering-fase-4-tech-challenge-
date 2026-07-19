@@ -1,6 +1,8 @@
 .env
 data/**/*.csv
 data/**/*.parquet
+backend/services/training/ml/artifacts/*
+!backend/services/training/ml/artifacts/.gitkeep
 
 # Created by https://www.toptal.com/developers/gitignore/api/python
 # Edit at https://www.toptal.com/developers/gitignore?templates=python

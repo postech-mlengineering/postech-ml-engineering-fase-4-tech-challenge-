@@ -11,11 +11,12 @@ router = APIRouter(prefix="/ml", tags=["ML"])
     "/train",
     response_model=TrainModelResponse,
     status_code=status.HTTP_200_OK,
-    summary="Train and activate an in-memory LSTM model",
+    summary="Train and save local LSTM artifacts",
     description=(
         "Downloads historical closing prices for the requested ticker, trains a PyTorch LSTM synchronously, "
-        "and makes it the active model for this API process. Requires an administrator JWT. "
-        "No `.pkl` or `.pth` artifact is persisted: the model and scaler are lost after a restart, sleep, or redeploy."
+        "and saves `model.pth`, `scaler.pkl`, and `metadata.json` under `backend/services/training/ml/artifacts`. "
+        "Requires an administrator JWT. The local filesystem is ephemeral on Render Free, so these files are lost "
+        "after a restart, sleep, or redeploy."
     ),
     response_description="The newly trained active model, including normalized-data evaluation metrics.",
     responses={
@@ -39,10 +40,10 @@ def train(
 @router.get(
     "/active",
     response_model=ActiveModelResponse,
-    summary="Get active in-memory model status",
+    summary="Get local model artifact status",
     description=(
-        "Returns metadata for the model currently held in this API process. `model_loaded` is false after startup, "
-        "sleep, restart, or redeploy until an administrator trains a new model."
+        "Returns metadata for the local artifact set. `model_loaded` is false when the local files do not exist, "
+        "including after a restart, sleep, or redeploy on Render Free."
     ),
 )
 def active_model(operations = Depends(get_model_operations)) -> ActiveModelResponse:

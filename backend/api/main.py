@@ -14,14 +14,14 @@ Stock LSTM Prediction API exposes a trained recurrent neural network for next-da
 Workflow:
 
 1. Authenticate as an administrator and call `POST /ml/train` with a ticker.
-2. The API downloads market data, trains a PyTorch LSTM, and keeps the model and scaler in this process's memory.
+2. The API downloads market data, trains a PyTorch LSTM, and writes the model, scaler, and metadata locally.
 3. Send at least 60 historical closing prices to `POST /predict`.
 
 ## Render Free behavior
 
-Training does **not** create persistent `.pkl` or `.pth` files. The active model and scaler are in-memory only.
-They are lost when the service restarts, sleeps, or is redeployed. In that case, call `POST /ml/train` again
-before requesting a prediction.
+Training creates `model.pth`, `scaler.pkl`, and `metadata.json` in `backend/services/training/ml/artifacts`.
+On Render Free this local filesystem is ephemeral: the files are lost when the service restarts, sleeps, or is
+redeployed. In that case, call `POST /ml/train` again before requesting a prediction.
 
 Monitoring is available at `/metrics` for Prometheus-compatible collectors.
 """
@@ -42,8 +42,8 @@ TAGS_METADATA = [
     {
         "name": "ML",
         "description": (
-            "Administrator-only training and active-model status. Models are held only in process memory "
-            "and are lost after a restart, sleep, or redeploy on Render Free."
+            "Administrator-only training and local artifact status. Artifacts are lost after a restart, sleep, "
+            "or redeploy on Render Free."
         ),
     },
     {
