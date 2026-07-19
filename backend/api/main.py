@@ -6,15 +6,22 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from api.routes.status import router as status_router
 from api.routes.prediction import router as prediction_router
 from api.routes.auth import router as auth_router
+from api.routes.ml import router as models_router
 
 API_DESCRIPTION = """
 Stock LSTM Prediction API exposes a trained recurrent neural network for next-day closing-price prediction.
 
 Workflow:
 
-1. Train the model with `python -m training.train --ticker AAPL`.
-2. Start the API with `uvicorn api.main:app --reload`.
+1. Authenticate as an administrator and call `POST /ml/train` with a ticker.
+2. The API downloads market data, trains a PyTorch LSTM, and keeps the model and scaler in this process's memory.
 3. Send at least 60 historical closing prices to `POST /predict`.
+
+## Render Free behavior
+
+Training does **not** create persistent `.pkl` or `.pth` files. The active model and scaler are in-memory only.
+They are lost when the service restarts, sleeps, or is redeployed. In that case, call `POST /ml/train` again
+before requesting a prediction.
 
 Monitoring is available at `/metrics` for Prometheus-compatible collectors.
 """
@@ -31,6 +38,13 @@ TAGS_METADATA = [
     {
         "name": "Prediction",
         "description": "Model inference endpoints for stock closing-price prediction.",
+    },
+    {
+        "name": "ML",
+        "description": (
+            "Administrator-only training and active-model status. Models are held only in process memory "
+            "and are lost after a restart, sleep, or redeploy on Render Free."
+        ),
     },
     {
         "name": "Monitoring",
@@ -57,6 +71,7 @@ app = FastAPI(
 app.include_router(auth_router)
 app.include_router(status_router)
 app.include_router(prediction_router)
+app.include_router(models_router)
 
 # Expose metrics
 Instrumentator().instrument(app).expose(
