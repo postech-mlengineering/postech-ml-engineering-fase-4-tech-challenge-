@@ -100,8 +100,8 @@ Requires a history of at least 60 prices. Only the last 60 prices are used for i
 ### 4. Prometheus Metrics (`GET /metrics`)
 Exposes performance metrics for Prometheus scraping.
 
-### 5. Train Model (`POST /models/train`)
-Requires an administrator Bearer token. Downloads closing prices for the requested ticker, trains the LSTM synchronously, and makes it the active model for this API instance.
+### 5. Train Model (`POST /ml/train`)
+Requires an administrator Bearer token. Downloads closing prices for the requested ticker, trains the LSTM synchronously, and writes `model.pth`, `scaler.pkl`, and `metadata.json` to `backend/services/training/ml/artifacts`.
 
 ```json
 {
@@ -112,8 +112,8 @@ Requires an administrator Bearer token. Downloads closing prices for the request
 }
 ```
 
-The active model is kept only in memory. On Render Free it is lost whenever the service restarts, sleeps, or is redeployed; train it again before calling `/predict`.
+On Render Free the local artifacts are lost whenever the service restarts, sleeps, or is redeployed; train again before calling `/predict`.
 `API_ADMIN_USERNAME` can be set to a different administrator account; it defaults to `API_USERNAME`.
 
-### 6. Active Model (`GET /models/active`)
-Returns whether a model is loaded in the current process and, when available, its ticker, training timestamp, parameters, and metrics.
+### 6. Active Model (`GET /ml/active`)
+Returns whether the local model artifact set exists and, when available, its ticker, training timestamp, parameters, and metrics.

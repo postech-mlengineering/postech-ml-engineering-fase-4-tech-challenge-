@@ -11,7 +11,7 @@ router = APIRouter(tags=["Prediction"])
     description=(
         "Predict the next closing price from historical closes. The request must contain at least 60 prices "
         "ordered from oldest to newest. If more than 60 prices are provided, only the latest 60 are used. "
-        "This endpoint is rate-limited and requires JWT authentication. It uses only the active in-memory model; "
+        "This endpoint is rate-limited and requires JWT authentication. It loads the local model artifacts; "
         "call `POST /ml/train` again after the service restarts, sleeps, or is redeployed."
     ),
     response_description="Predicted next closing price rounded to two decimal places.",
@@ -48,7 +48,7 @@ router = APIRouter(tags=["Prediction"])
             "description": "Too many requests. Rate limit exceeded.",
         },
         503: {
-            "description": "No active in-memory model is available. An administrator must call `POST /ml/train` first.",
+            "description": "No local model artifacts are available. An administrator must call `POST /ml/train` first.",
             "content": {
                 "application/json": {
                     "example": {

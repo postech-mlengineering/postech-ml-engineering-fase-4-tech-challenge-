@@ -9,7 +9,7 @@ router = APIRouter(tags=["Status"])
     response_model=HealthResponse,
     summary="Root health check",
     description=(
-        "Return API status and whether an active model is currently held in memory. "
+        "Return API status and whether the local model artifact files are available. "
         "`model_loaded` becomes false after a restart, sleep, or redeploy on Render Free."
     ),
     responses={
@@ -32,7 +32,7 @@ def root(operations = Depends(get_model_operations)) -> HealthResponse:
     response_model=HealthResponse,
     summary="Deployment health check",
     description=(
-        "Return API readiness information and active in-memory model availability. Use this endpoint in Docker, "
+        "Return API readiness information and local model artifact availability. Use this endpoint in Docker, "
         "Render, Railway, OCI, or load-balancer health checks."
     ),
     responses={
