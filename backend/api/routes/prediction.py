@@ -1,8 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from api.dependencies import get_model_artifacts, get_current_user, rate_limit_predict
-from api.schemas import PredictionRequest, PredictionResponse
-from services.prediction_service import predict_next_close
-from services.cache_service import prediction_cache
+from fastapi import APIRouter, Depends
+from api.dependencies import get_current_user, get_prediction_operations, rate_limit_predict
+from api.models.schemas import PredictionRequest, PredictionResponse
 
 router = APIRouter(tags=["Prediction"])
 
@@ -13,7 +11,8 @@ router = APIRouter(tags=["Prediction"])
     description=(
         "Predict the next closing price from historical closes. The request must contain at least 60 prices "
         "ordered from oldest to newest. If more than 60 prices are provided, only the latest 60 are used. "
-        "This endpoint is rate-limited and requires JWT authentication."
+        "This endpoint is rate-limited and requires JWT authentication. It uses only the active in-memory model; "
+        "call `POST /ml/train` again after the service restarts, sleeps, or is redeployed."
     ),
     response_description="Predicted next closing price rounded to two decimal places.",
     dependencies=[Depends(rate_limit_predict)],
@@ -49,14 +48,11 @@ router = APIRouter(tags=["Prediction"])
             "description": "Too many requests. Rate limit exceeded.",
         },
         503: {
-            "description": "Model artifacts are missing. Train the model before calling this endpoint.",
+            "description": "No active in-memory model is available. An administrator must call `POST /ml/train` first.",
             "content": {
                 "application/json": {
                     "example": {
-                        "detail": (
-                            "Missing artifacts. Expected model at model/stock_lstm.keras "
-                            "and scaler at model/scaler.pkl."
-                        )
+                        "detail": "No active model. An administrator must train a model first."
                     }
                 }
             },
@@ -65,21 +61,9 @@ router = APIRouter(tags=["Prediction"])
 )
 def predict(
     request: PredictionRequest,
-    artifacts=Depends(get_model_artifacts),
     current_user: str = Depends(get_current_user),
+    operations = Depends(get_prediction_operations),
 ) -> PredictionResponse:
-    # Check cache first
-    cached_val = prediction_cache.get(request.prices)
-    if cached_val is not None:
-        return PredictionResponse(prediction=round(cached_val, 2))
-
-    model, scaler = artifacts
-    try:
-        prediction = predict_next_close(request.prices, model, scaler)
-    except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
-
-    # Store in cache
-    prediction_cache.set(request.prices, prediction)
+    prediction = operations.predict(request.prices)
 
     return PredictionResponse(prediction=round(prediction, 2))

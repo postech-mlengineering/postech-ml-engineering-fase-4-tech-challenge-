@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 import os
 import jwt
 from fastapi import APIRouter, HTTPException, status
-from pydantic import BaseModel
+from api.models.schemas import TokenResponse, UserAuthRequest
 
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "super-secret-key-lstm-prediction-challenge")
 JWT_ALGORITHM = "HS256"
@@ -12,14 +12,6 @@ API_USERNAME = os.getenv("API_USERNAME", "admin")
 API_PASSWORD = os.getenv("API_PASSWORD", "admin")
 
 router = APIRouter(tags=["Authentication"])
-
-class UserAuthRequest(BaseModel):
-    username: str
-    password: str
-
-class TokenResponse(BaseModel):
-    access_token: str
-    token_type: str
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     to_encode = data.copy()

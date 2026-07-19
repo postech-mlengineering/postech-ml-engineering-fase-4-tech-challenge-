@@ -209,3 +209,5 @@ hs_err_pid*
 replay_pid*
 
 # End of https://www.toptal.com/developers/gitignore/api/java
+docs/implementation_plan_render_free.md
+docs/future_evolution_external_artifacts.md

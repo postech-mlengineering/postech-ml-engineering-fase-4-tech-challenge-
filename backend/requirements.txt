@@ -5,9 +5,13 @@ tenacity
 uvicorn
 websockets
 pandas
+python-dateutil
+pytz
+six
 numpy
 scikit-learn
 torch
+yfinance
 joblib
 pyjwt
 pydantic>=2.13.4

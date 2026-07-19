@@ -26,4 +26,7 @@ class PredictionCache:
         expire = time.time() + self.ttl
         self.cache[key] = (val, expire)
 
+    def clear(self):
+        self.cache.clear()
+
 prediction_cache = PredictionCache()
