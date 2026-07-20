@@ -16,13 +16,15 @@ router = APIRouter(prefix="/ml", tags=["ML"])
         "Downloads historical closing prices for the requested ticker, trains a PyTorch LSTM synchronously, "
         "and saves `model.pth`, `scaler.pkl`, and `metadata.json` under `backend/services/training/ml/artifacts`. "
         "Requires an administrator JWT. The local filesystem is ephemeral on Render Free, so these files are lost "
-        "after a restart, sleep, or redeploy."
+        "after a restart, sleep, or redeploy. If Yahoo Finance rate-limits the instance, this endpoint returns "
+        "`429` and honors a local cooldown before making another provider request."
     ),
     response_description="The newly trained active model, including normalized-data evaluation metrics.",
     responses={
         401: {"description": "Missing or invalid JWT."},
         403: {"description": "The authenticated user is not the configured administrator."},
         409: {"description": "Another model-training operation is already running."},
+        429: {"description": "Yahoo Finance rate-limited the service. Retry after the `Retry-After` response header."},
         422: {"description": "Invalid ticker, unsupported date range, insufficient data, or invalid parameters."},
         502: {"description": "Yahoo Finance could not be reached from the API environment."},
         500: {"description": "The model-training operation failed unexpectedly."},
