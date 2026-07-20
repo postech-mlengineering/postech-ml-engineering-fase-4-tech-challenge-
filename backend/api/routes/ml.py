@@ -24,6 +24,7 @@ router = APIRouter(prefix="/ml", tags=["ML"])
         403: {"description": "The authenticated user is not the configured administrator."},
         409: {"description": "Another model-training operation is already running."},
         422: {"description": "Invalid ticker, unsupported date range, insufficient data, or invalid parameters."},
+        502: {"description": "Yahoo Finance could not be reached from the API environment."},
         500: {"description": "The model-training operation failed unexpectedly."},
     },
 )
@@ -46,5 +47,7 @@ def train(
         "including after a restart, sleep, or redeploy on Render Free."
     ),
 )
-def active_model(operations = Depends(get_model_operations)) -> ActiveModelResponse:
+def active_model(
+    _: str = Depends(get_current_admin),
+    operations = Depends(get_model_operations)) -> ActiveModelResponse:
     return operations.active()
