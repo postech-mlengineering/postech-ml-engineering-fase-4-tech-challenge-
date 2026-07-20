@@ -9,7 +9,7 @@ from services.cache_service import prediction_cache
 from services.model_service import ModelService, TrainingInProgressError
 from services.prediction_use_case_service import PredictionService
 from services.rate_limiter import predict_rate_limiter
-from services.training.data_service import MarketDataProviderError
+from services.training.data_service import MarketDataProviderError, YahooRateLimitError
 from services.training.ml.artifact_service import ArtifactUnavailableError, LocalArtifactService
 
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "super-secret-key-lstm-prediction-challenge")
@@ -38,6 +38,12 @@ class ModelOperations:
             metadata = model_service.train(ticker, start_date, lookback, epochs)
         except TrainingInProgressError as exc:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+        except YahooRateLimitError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail=str(exc),
+                headers={"Retry-After": str(exc.retry_after_seconds)},
+            ) from exc
         except MarketDataProviderError as exc:
             raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(exc)) from exc
         except ValueError as exc:
