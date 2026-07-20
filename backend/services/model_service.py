@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 from datetime import date, datetime, timezone
+import logging
 from threading import Lock
 
 from services.cache_service import PredictionCache, prediction_cache
 from services.training.ml.artifact_service import LocalArtifactService
+
+logger = logging.getLogger(__name__)
 
 
 class TrainingInProgressError(RuntimeError):
@@ -26,6 +29,7 @@ class ModelService:
             raise TrainingInProgressError("A model training operation is already in progress.")
         try:
             normalized_ticker = normalize_ticker(ticker)
+            logger.info("Model training started for ticker=%s", normalized_ticker)
             close_prices = download_close_prices(normalized_ticker, start_date)
             data, scaler = build_training_data(close_prices, lookback)
             model, metrics = train_model(data, epochs)
@@ -37,6 +41,14 @@ class ModelService:
             }
             self._artifacts.save(model, scaler, metadata)
             self._cache.clear()
+            logger.info("Model training completed and artifacts were saved for ticker=%s", normalized_ticker)
             return metadata
+        except ValueError as exc:
+            logger.warning("Model training rejected for ticker=%s: %s", ticker, exc)
+            raise
+        except Exception:
+            logger.exception("Model training failed for ticker=%s", ticker)
+            raise
         finally:
             self._training_lock.release()
+            logger.info("Model training lock released for ticker=%s", ticker)
