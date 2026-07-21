@@ -55,8 +55,33 @@ Alternatively, you can run it directly using `uv run` (without manual activation
 uv run uvicorn app:app --reload
 ```
 
-The API will be available at: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+The API will be available at: 
+
+## Development
+### API
+[http://127.0.0.1:8000](http://127.0.0.1:8000)
 Interactive Swagger documentation will be available at: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+
+## Production
+### API
+[https://api-132t.onrender.com](https://api-132t.onrender.com)
+Interactive Swagger documentation will be available at: [https://api-132t.onrender.com/docs](https://api-132t.onrender.com/docs)
+
+### Prometheus
+Client to get metrics
+[https://prometheus-132t.onrender.com/](https://prometheus-132t.onrender.com/)
+Interactive Prometheus metrics will be available at: [https://prometheus-132t.onrender.com/metrics](https://prometheus-132t.onrender.com/metrics)
+
+### Grafana
+Dashboard
+[https://grafana-132t.onrender.com/](https://grafana-132t.onrender.com/)
+Interactive Grafana dashboard will be available at: [https://grafana-132t.onrender.com/](https://grafana-132t.onrender.com/)
+
+---
+
+## Postman Configuration
+
+Import [postman_collection.json](postman_collection.json) file in Postman to get all endpoints ready.
 
 ---
 
