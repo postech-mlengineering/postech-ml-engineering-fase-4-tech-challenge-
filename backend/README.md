@@ -62,28 +62,47 @@ Interactive Swagger documentation will be available at: [http://127.0.0.1:8000/d
 
 ## Endpoint Details
 
-### 1. Root Health Check (`GET /`)
-Checks whether the server is up and if the required model artifacts are loaded.
+### 1. Authenticate User & Get Token (`POST /auth/token`)
+Accepts JSON payload with credentials and returns a JWT access token valid for 30 minutes.
+- **Request Body:**
+  ```json
+  {
+    "username": "admin",
+    "password": "admin"
+  }
+  ```
 - **Response Example:**
   ```json
   {
-    "status": "ok",
-    "model_loaded": true
+    "access_token": "eyJhbGciOiJIUzI1NiIsIn...",
+    "token_type": "bearer"
   }
   ```
 
-### 2. Deployment Health Check (`GET /health`)
-Used for readiness checks in environments like Docker, Kubernetes, etc.
-- **Response Example:**
-  ```json
-  {
-    "status": "ok",
-    "model_loaded": true
-  }
-  ```
+### 2. Train Model (`POST /ml/train`)
+Requires an administrator Bearer token. Downloads closing prices for last 120 days of the requested ticker, trains the LSTM synchronously, and writes `model.pth`, `scaler.pkl`, and `metadata.json` to `backend/services/training/ml/artifacts`.
+- **Security**: Requires a valid Bearer token for the administrator user.
+- **Body Example:**
+```json
+{
+  "ticker": "AAPL",
+  "lookback": 60,
+  "epochs": 50
+}
+```
 
-### 3. Predict Next Closing Price (`POST /predict`)
+On Render Free the local artifacts are lost whenever the service restarts, sleeps, or is redeployed; train again before calling `/predict`.
+`API_ADMIN_USERNAME` can be set to a different administrator account; it defaults to `API_USERNAME`.
+
+### 3. Active Model (`GET /ml/active`)
+Returns whether the local model artifact set exists and, when available, its ticker, training timestamp, parameters, and metrics.
+- **Security**: Requires a valid Bearer token for the administrator user.
+
+### 4. Predict Next Closing Price (`POST /predict`)
 Requires a history of at least 60 prices. Only the last 60 prices are used for inference.
+- **Security**: Requires a valid Bearer token in the `Authorization` header (`Authorization: Bearer <token>`).
+- **Caching**: Response predictions are cached in-memory for 5 minutes using a hash of the input sequence.
+- **Rate Limit**: Enforces a limit of 5 requests per minute per IP address. Exceeding this returns a `429 Too Many Requests` status code.
 - **Body Example:**
   ```json
   {
@@ -97,22 +116,25 @@ Requires a history of at least 60 prices. Only the last 60 prices are used for i
   }
   ```
 
-### 4. Prometheus Metrics (`GET /metrics`)
+### 5. Prometheus Metrics (`GET /metrics`)
 Exposes performance metrics for Prometheus scraping.
 
-### 5. Train Model (`POST /ml/train`)
-Requires an administrator Bearer token. Downloads closing prices for the requested ticker, trains the LSTM synchronously, and writes `model.pth`, `scaler.pkl`, and `metadata.json` to `backend/services/training/ml/artifacts`.
+### 6. Root Health Check (`GET /`)
+Checks whether the server is up and if the required model artifacts are loaded.
+- **Response Example:**
+  ```json
+  {
+    "status": "ok",
+    "model_loaded": true
+  }
+  ```
 
-```json
-{
-  "ticker": "AAPL",
-  "lookback": 60,
-  "epochs": 50
-}
-```
-
-On Render Free the local artifacts are lost whenever the service restarts, sleeps, or is redeployed; train again before calling `/predict`.
-`API_ADMIN_USERNAME` can be set to a different administrator account; it defaults to `API_USERNAME`.
-
-### 6. Active Model (`GET /ml/active`)
-Returns whether the local model artifact set exists and, when available, its ticker, training timestamp, parameters, and metrics.
+### 7. Deployment Health Check (`GET /health`)
+Used for readiness checks in environments like Docker, Kubernetes, etc.
+- **Response Example:**
+  ```json
+  {
+    "status": "ok",
+    "model_loaded": true
+  }
+  ```

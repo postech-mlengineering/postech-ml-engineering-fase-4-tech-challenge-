@@ -27,6 +27,8 @@ services:
         value: postgres
       - key: GF_DATASOURCE_PROMETHEUS_URL
         value: https://prometheus.onrender.com
+      - key: PROMETHEUS_URL
+        value: https://prometheus-132t.onrender.com
       - key: GF_DATABASE_HOST
         fromDatabase:
           name: grafana-db

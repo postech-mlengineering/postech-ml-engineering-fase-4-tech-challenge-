@@ -75,7 +75,7 @@ Interactive Prometheus metrics will be available at: [https://prometheus-132t.on
 ### Grafana
 Dashboard
 [https://grafana-132t.onrender.com/](https://grafana-132t.onrender.com/)
-Interactive Grafana dashboard will be available at: [https://grafana-132t.onrender.com/](https://grafana-132t.onrender.com/)
+Interactive Grafana dashboard will be available at: [https://grafana-132t.onrender.com/d/86fc87a7-3e86-44c0-a729-08896ddec85d/stock-lstm-api-metrics?orgId=1&from=now-5m&to=now&timezone=browser&refresh=auto](https://grafana-132t.onrender.com/)
 
 ---
 
@@ -104,25 +104,24 @@ Accepts JSON payload with credentials and returns a JWT access token valid for 3
   }
   ```
 
-### 2. Root Health Check (`GET /`)
-Checks whether the server is up and if the required model artifacts are loaded.
-- **Response Example:**
-  ```json
-  {
-    "status": "ok",
-    "model_loaded": true
-  }
-  ```
+### 2. Train Model (`POST /ml/train`)
+Requires an administrator Bearer token. Downloads closing prices for last 120 days of the requested ticker, trains the LSTM synchronously, and writes `model.pth`, `scaler.pkl`, and `metadata.json` to `backend/services/training/ml/artifacts`.
+- **Security**: Requires a valid Bearer token for the administrator user.
+- **Body Example:**
+```json
+{
+  "ticker": "AAPL",
+  "lookback": 60,
+  "epochs": 50
+}
+```
 
-### 3. Deployment Health Check (`GET /health`)
-Used for readiness checks in environments like Docker, Kubernetes, etc.
-- **Response Example:**
-  ```json
-  {
-    "status": "ok",
-    "model_loaded": true
-  }
-  ```
+On Render Free the local artifacts are lost whenever the service restarts, sleeps, or is redeployed; train again before calling `/predict`.
+`API_ADMIN_USERNAME` can be set to a different administrator account; it defaults to `API_USERNAME`.
+
+### 3. Active Model (`GET /ml/active`)
+Returns whether the local model artifact set exists and, when available, its ticker, training timestamp, parameters, and metrics.
+- **Security**: Requires a valid Bearer token for the administrator user.
 
 ### 4. Predict Next Closing Price (`POST /predict`)
 Requires a history of at least 60 prices. Only the last 60 prices are used for inference.
@@ -145,21 +144,22 @@ Requires a history of at least 60 prices. Only the last 60 prices are used for i
 ### 5. Prometheus Metrics (`GET /metrics`)
 Exposes performance metrics for Prometheus scraping.
 
-### 6. Train Model (`POST /ml/train`)
-Requires an administrator Bearer token. Downloads closing prices for the requested ticker, trains the LSTM synchronously, and writes `model.pth`, `scaler.pkl`, and `metadata.json` to `backend/services/training/ml/artifacts`.
-- **Security**: Requires a valid Bearer token for the administrator user.
-- **Body Example:**
-```json
-{
-  "ticker": "AAPL",
-  "lookback": 60,
-  "epochs": 50
-}
-```
+### 6. Root Health Check (`GET /`)
+Checks whether the server is up and if the required model artifacts are loaded.
+- **Response Example:**
+  ```json
+  {
+    "status": "ok",
+    "model_loaded": true
+  }
+  ```
 
-On Render Free the local artifacts are lost whenever the service restarts, sleeps, or is redeployed; train again before calling `/predict`.
-`API_ADMIN_USERNAME` can be set to a different administrator account; it defaults to `API_USERNAME`.
-
-### 7. Active Model (`GET /ml/active`)
-Returns whether the local model artifact set exists and, when available, its ticker, training timestamp, parameters, and metrics.
-- **Security**: Requires a valid Bearer token for the administrator user.
+### 7. Deployment Health Check (`GET /health`)
+Used for readiness checks in environments like Docker, Kubernetes, etc.
+- **Response Example:**
+  ```json
+  {
+    "status": "ok",
+    "model_loaded": true
+  }
+  ```
