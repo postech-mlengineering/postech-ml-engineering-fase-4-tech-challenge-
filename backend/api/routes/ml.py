@@ -25,7 +25,7 @@ router = APIRouter(prefix="/ml", tags=["ML"])
         403: {"description": "The authenticated user is not the configured administrator."},
         409: {"description": "Another model-training operation is already running."},
         429: {"description": "Yahoo Finance rate-limited the service. Retry after the `Retry-After` response header."},
-        422: {"description": "Invalid ticker, unsupported date range, insufficient data, or invalid parameters."},
+        422: {"description": "Invalid ticker, insufficient data, or invalid parameters."},
         502: {"description": "Yahoo Finance could not be reached from the API environment."},
         500: {"description": "The model-training operation failed unexpectedly."},
     },
@@ -36,7 +36,7 @@ def train(
     operations = Depends(get_model_operations),
 ) -> TrainModelResponse:
     return TrainModelResponse(
-        model=operations.train(request.ticker, request.start_date, request.lookback, request.epochs)
+        model=operations.train(request.ticker, request.lookback, request.epochs)
     )
 
 

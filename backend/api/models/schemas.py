@@ -29,7 +29,6 @@ class TokenResponse(BaseModel):
 
 class TrainModelRequest(BaseModel):
     ticker: str = Field(..., min_length=1, max_length=15, description="Ticker to download and train, such as AAPL.")
-    start_date: date = Field(default=date(2018, 1, 1), description="First date of historical data, limited to the last 10 years.")
     lookback: int = Field(default=60, ge=20, le=120, description="Number of closing prices in each LSTM input window.")
     epochs: int = Field(default=50, ge=1, le=50, description="Training epochs; capped to protect the Render Free instance.")
 

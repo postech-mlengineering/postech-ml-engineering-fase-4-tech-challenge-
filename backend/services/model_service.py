@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timezone, timedelta
 import logging
 from threading import Lock
 
@@ -20,7 +20,7 @@ class ModelService:
         self._cache = cache
         self._training_lock = Lock()
 
-    def train(self, ticker: str, start_date: date, lookback: int, epochs: int) -> dict:
+    def train(self, ticker: str, lookback: int, epochs: int) -> dict:
         from services.training.data_service import download_close_prices, normalize_ticker
         from services.training.feature_service import build_training_data
         from services.training.training_service import train_model
@@ -28,9 +28,10 @@ class ModelService:
         if not self._training_lock.acquire(blocking=False):
             raise TrainingInProgressError("A model training operation is already in progress.")
         try:
+            start_date = datetime.now(timezone.utc)
             normalized_ticker = normalize_ticker(ticker)
             logger.info("Model training started for ticker=%s", normalized_ticker)
-            close_prices = download_close_prices(normalized_ticker, start_date)
+            close_prices = download_close_prices(normalized_ticker, start_date.date() - timedelta(days=120))
             data, scaler = build_training_data(close_prices, lookback)
             model, metrics = train_model(data, epochs)
             metadata = {

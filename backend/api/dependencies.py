@@ -33,9 +33,9 @@ class PredictionOperations:
 
 
 class ModelOperations:
-    def train(self, ticker: str, start_date, lookback: int, epochs: int) -> ModelMetadata:
+    def train(self, ticker: str, lookback: int, epochs: int) -> ModelMetadata:
         try:
-            metadata = model_service.train(ticker, start_date, lookback, epochs)
+            metadata = model_service.train(ticker, lookback, epochs)
         except TrainingInProgressError as exc:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
         except YahooRateLimitError as exc:

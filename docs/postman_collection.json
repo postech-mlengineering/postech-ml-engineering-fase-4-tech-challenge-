@@ -68,7 +68,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ticker\": \"{{ticker}}\",\n  \"start_date\": \"{{start_date}}\",\n  \"lookback\": {{lookback}},\n  \"epochs\": {{epochs}}\n}"
+              "raw": "{\n  \"ticker\": \"{{ticker}}\",\n  \"lookback\": {{lookback}},\n  \"epochs\": {{epochs}}\n}"
             },
             "url": "{{base_url}}/ml/train",
             "description": "Downloads market data and trains synchronously, writing model.pth, scaler.pkl, and metadata.json locally. Requires the administrator user. On Render Free the files are lost after restart, sleep, or redeploy."
@@ -196,11 +196,6 @@
     {
       "key": "ticker",
       "value": "AAPL",
-      "type": "string"
-    },
-    {
-      "key": "start_date",
-      "value": "2018-01-01",
       "type": "string"
     },
     {

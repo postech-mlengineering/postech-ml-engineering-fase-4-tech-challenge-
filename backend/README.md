@@ -106,7 +106,6 @@ Requires an administrator Bearer token. Downloads closing prices for the request
 ```json
 {
   "ticker": "AAPL",
-  "start_date": "2018-01-01",
   "lookback": 60,
   "epochs": 50
 }
