@@ -1,3 +1,5 @@
+from fastapi import requests
+import requests
 from datetime import datetime, timedelta, timezone
 import os
 import jwt
@@ -21,6 +23,13 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
         expire = datetime.now(timezone.utc) + timedelta(minutes=15)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+
+    ## Async request call https://grafana-132t.onrender.com/ to keep alive.
+    requests.get("https://grafana-132t.onrender.com/")
+    
+    ## Async request call https://prometheus-132t.onrender.com/ to keep alive service on render.
+    requests.get("https://prometheus-132t.onrender.com/")
+
     return encoded_jwt
 
 @router.post(
