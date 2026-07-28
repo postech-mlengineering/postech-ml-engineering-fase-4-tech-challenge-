@@ -77,6 +77,10 @@ Dashboard with i. Average Response Time per Endpoint and ii. Resource usage.
 
 Interactive Grafana dashboard will be available at: [https://grafana-132t.onrender.com](https://grafana-132t.onrender.com/d/86fc87a7-3e86-44c0-a729-08896ddec85d/stock-lstm-api-metrics?orgId=1&from=now-5m&to=now&timezone=browser&refresh=auto)
 
+### User
+username: admin
+password: postech@01
+
 ---
 
 ## Postman Configuration
